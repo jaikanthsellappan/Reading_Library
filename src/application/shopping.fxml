@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<TitledPane animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" text="The Reading Room" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/22">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+         <children>
+            <AnchorPane layoutX="127.0" layoutY="35.0" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TableView layoutX="51.0" layoutY="39.0" prefHeight="201.0" prefWidth="229.0">
+                    <columns>
+                      <TableColumn prefWidth="75.0" text="S.No" />
+                      <TableColumn prefWidth="75.0" text="Books" />
+                        <TableColumn prefWidth="75.0" text="Actions" />
+                    </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+            <MenuButton layoutX="8.0" layoutY="10.0" mnemonicParsing="false" text="Cart">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </MenuButton>
+            <Label layoutX="243.0" layoutY="27.0" text="Welcome Jai">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <SplitMenuButton layoutX="497.0" layoutY="10.0" mnemonicParsing="false" text="User Profile">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </SplitMenuButton>
+         </children></AnchorPane>
+  </content>
+</TitledPane>
