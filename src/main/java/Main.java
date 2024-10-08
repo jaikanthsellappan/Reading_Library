@@ -23,6 +23,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			//setting up the necessary tables in the database for the reading library project
 			model.setup();
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
 			

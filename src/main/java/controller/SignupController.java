@@ -45,20 +45,27 @@ public class SignupController {
 	public void initialize() {
 		createUser.setOnAction(event -> {
 			if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
-				User user;
-				try {
-					user = model.getUserDao().createUser(username.getText(), password.getText());
-					if (user != null) {
-						status.setText("Created " + user.getUsername());
-						status.setTextFill(Color.GREEN);
-					} else {
-						status.setText("Cannot create user");
+//				if(password.getText().toString() == confirmPassword.getText().toString())
+//				{
+					User user;
+					try {
+						user = model.getUserDao().createUser(username.getText(), firstname.getText(), lastname.getText(), password.getText());
+						if (user != null) {
+							status.setText("Created " + user.getUsername());
+							status.setTextFill(Color.GREEN);
+						} else {
+							status.setText("Cannot create user");
+							status.setTextFill(Color.RED);
+						}
+					} catch (SQLException e) {
+						status.setText(e.getMessage());
 						status.setTextFill(Color.RED);
 					}
-				} catch (SQLException e) {
-					status.setText(e.getMessage());
-					status.setTextFill(Color.RED);
-				}
+//				}
+//				else {
+//					status.setText("password and confirm password doesn't match");
+//					status.setTextFill(Color.RED);
+//				}
 				
 			} else {
 				status.setText("Empty username or password");
