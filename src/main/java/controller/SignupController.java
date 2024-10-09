@@ -49,7 +49,8 @@ public class SignupController {
 //				{
 					User user;
 					try {
-						user = model.getUserDao().createUser(username.getText(), firstname.getText(), lastname.getText(), password.getText());
+						Boolean is_admin = false;
+						user = model.getUserDao().createUser(username.getText(), firstname.getText(), lastname.getText(), password.getText(), is_admin);
 						if (user != null) {
 							status.setText("Created " + user.getUsername());
 							status.setTextFill(Color.GREEN);

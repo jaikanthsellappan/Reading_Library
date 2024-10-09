@@ -20,7 +20,7 @@ public class UserDaoImpl implements UserDao {
 				Statement stmt = connection.createStatement();) {
 			String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (username VARCHAR(25) NOT NULL," 
 				+ "firstname VARCHAR(30) NOT NULL," + "lastname VARCHAR(30) NOT NULL,"
-					+ "password VARCHAR(8) NOT NULL," + "PRIMARY KEY (username))";
+					+ "password VARCHAR(8) NOT NULL," + "is_admin BOOLEAN NOT NULL," + "PRIMARY KEY (username))";
 			stmt.executeUpdate(sql);
 		} 
 	}
@@ -38,6 +38,8 @@ public class UserDaoImpl implements UserDao {
 					User user = new User();
 					user.setUsername(rs.getString("username"));
 					user.setPassword(rs.getString("password"));
+					user.setFirstName(rs.getString("firstname"));
+					user.setLastName(rs.getString("lastname"));
 					return user;
 				}
 				return null;
@@ -46,17 +48,19 @@ public class UserDaoImpl implements UserDao {
 	}
 
 	@Override
-	public User createUser(String username, String firstname, String lastname,  String password) throws SQLException {
-		String sql = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?)";
+	public User createUser(String username, String firstname, String lastname,  String password, Boolean is_admin) throws SQLException {
+		String sql = "INSERT INTO " + TABLE_NAME + " VALUES (?, ?, ?, ?, ?)";
 		try (Connection connection = Database.getConnection();
 				PreparedStatement stmt = connection.prepareStatement(sql);) {
 			stmt.setString(1, username);
 			stmt.setString(2, firstname);
 			stmt.setString(3, lastname);
 			stmt.setString(4, password);
+			stmt.setBoolean(5, is_admin);
 
 			stmt.executeUpdate();
-			return new User(username, password);
+			// creating a new user with the given details
+			return new User(username, password, firstname, lastname, is_admin);
 		} 
 	}
 }
