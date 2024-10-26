@@ -4,20 +4,43 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" prefHeight="450.0" prefWidth="544.0">
-  <children>
-    <MenuBar fx:id="menu" prefHeight="25.0" prefWidth="870.0" VBox.vgrow="NEVER">
-      <menus>
-        <Menu fx:id="profile" mnemonicParsing="false" text="Profile">
-          <items>
-            <MenuItem fx:id="viewProfile" mnemonicParsing="false" text="View my profile" />
-            <MenuItem fx:id="updateProfile" mnemonicParsing="false" text="Update my profile" />
-          </items>
-        </Menu>
-      </menus>
-    </MenuBar>
-    <Label fx:id="popularBooksLabel" text="Top 5 Popular Books:" wrapText="true"/>
-  </children>
-</VBox>
+<AnchorPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" prefHeight="450.0" prefWidth="600.0">
+    
+    <!-- VBox to hold the profile menu and welcome label, anchored at the top -->
+    <VBox AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <!-- Profile menu -->
+        <MenuBar fx:id="menu">
+            <menus>
+                <Menu fx:id="profile" mnemonicParsing="false" text="Profile">
+                    <items>
+                        <MenuItem fx:id="viewProfile" mnemonicParsing="false" text="View my profile" />
+                        <MenuItem fx:id="updateProfile" mnemonicParsing="false" text="Update my profile" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+
+        <!-- Centered welcome label in an HBox -->
+        <HBox alignment="CENTER">
+            <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+        </HBox>
+    </VBox>
+
+    <!-- Centered TableView with "Action" column as the last column -->
+    <TableView fx:id="bookTable" AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.bottomAnchor="20.0">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="150" />
+            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
+            <TableColumn fx:id="priceColumn" text="Price (AUD)" prefWidth="100" />
+            <TableColumn fx:id="copiesColumn" text="Available Copies" prefWidth="100" />
+            <!-- Action column placed at the end with specific width -->
+            <TableColumn fx:id="actionColumn" text="Action" prefWidth="100" />
+        </columns>
+    </TableView>
+</AnchorPane>

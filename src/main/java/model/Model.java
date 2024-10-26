@@ -33,6 +33,11 @@ public class Model {
         return books.subList(0, Math.min(5, books.size())); // Return top 5 or fewer if not enough
 	}
 	
+	public void addBookToCart(Book book) {
+        // Implement the logic to add the book to the user's shopping cart
+        System.out.println("Book added to cart: " + book.getTitle());
+    }
+	
 	public User getCurrentUser() {
 		return this.currentUser;
 	}

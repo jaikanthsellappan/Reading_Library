@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -53,7 +54,7 @@ public class LoginController {
 							HomeController homeController = new HomeController(stage, model);
 							
 							loader.setController(homeController);
-							VBox root = loader.load();
+							AnchorPane root = loader.load();
 	
 							homeController.showStage(root);
 							stage.close();

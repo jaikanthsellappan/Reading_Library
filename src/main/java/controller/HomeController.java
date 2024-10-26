@@ -1,76 +1,135 @@
 package controller;
 
-import javafx.scene.control.Label; // JavaFX Label
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import java.sql.SQLException;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.Book;
 import model.Model;
 import model.User;
 
 public class HomeController {
-	private Model model;
-	private Stage stage;
-	private Stage parentStage;
-	@FXML
-	private MenuItem viewProfile; // Corresponds to the Menu item "viewProfile" in HomeView.fxml
-	@FXML
-	private MenuItem updateProfile; // // Corresponds to the Menu item "updateProfile" in HomeView.fxml
-	@FXML
-	private Label popularBooksLabel; // Add this to match the FXML file's Label
-	
-	public HomeController(Stage parentStage, Model model) {
-		this.stage = new Stage();
-		this.parentStage = parentStage;
-		this.model = new Model();
-	}
-	
-	// Add your code to complete the functionality of the program
-	@FXML
+    private Model model;
+    private Stage stage;
+
+    @FXML
+    private Label welcomeLabel;  // Label for welcome message
+    @FXML
+    private MenuItem viewProfile;
+    @FXML
+    private MenuItem updateProfile;
+    @FXML
+    private TableView<Book> bookTable;
+
+    @FXML
+    private TableColumn<Book, String> titleColumn;
+    @FXML
+    private TableColumn<Book, String> authorsColumn;
+    @FXML
+    private TableColumn<Book, Integer> priceColumn;
+    @FXML
+    private TableColumn<Book, Integer> copiesColumn;
+    @FXML
+    private TableColumn<Book, Void> actionColumn;
+
+    private ObservableList<Book> booksData;
+
+    public HomeController(Stage parentStage, Model model) {
+        this.stage = new Stage();
+        this.model = model;
+    }
+
+    @FXML
     public void initialize() throws SQLException {
+    	// Set column resize policy to prevent extra columns
+        bookTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        
+        User currentUser = model.getCurrentUser();
+        welcomeLabel.setText("Welcome, " + currentUser.getUsername() + "!");  // Set personalized welcome message
+
         viewProfile.setOnAction(event -> viewUserProfile());
         updateProfile.setOnAction(event -> updateUserProfile());
 
-        // Display popular books
-        displayPopularBooks();
+        // Configure table columns
+        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        copiesColumn.setCellValueFactory(new PropertyValueFactory<>("physicalCopies"));
+
+        // Add button to each row in action column
+        addButtonToTable();
+
+        // Load data into the table
+        loadBooksData();
+    }
+
+    private void loadBooksData() throws SQLException {
+        booksData = FXCollections.observableArrayList(model.books());
+        bookTable.setItems(booksData);
     }
 
     private void viewUserProfile() {
-        // Logic to display the user's profile
         User user = model.getCurrentUser();
-        // Implement a way to show user information, e.g., open a new dialog
         System.out.println("Viewing profile for: " + user.getUsername());
-        // Here you might want to create a separate ProfileController and FXML for viewing the profile
     }
 
     private void updateUserProfile() {
-        // Logic to update the user's profile
         System.out.println("Updating profile for: " + model.getCurrentUser().getUsername());
-        // Similar to viewing profile, implement a dialog or new screen for updating user info
     }
 
-    private void displayPopularBooks() throws SQLException {
-        List<Book> popularBooks = model.books(); // Implement this method in your Model class
-        StringBuilder sb = new StringBuilder("Top 5 Popular Books:\n");
-        for (Book book : popularBooks) {
-            sb.append(book.getTitle()).append(" by ").append(book.getAuthors()).append("\n");
-        }
-        popularBooksLabel.setText(sb.toString());
+    private void addButtonToTable() {
+        Callback<TableColumn<Book, Void>, TableCell<Book, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<Book, Void> call(final TableColumn<Book, Void> param) {
+                return new TableCell<>() {
+                    private final Button addButton = new Button("Add to Cart");
+
+                    {
+                        addButton.setOnAction(event -> {
+                            Book book = getTableView().getItems().get(getIndex());
+                            addToCart(book);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(addButton);
+                        }
+                    }
+                };
+            }
+        };
+        actionColumn.setCellFactory(cellFactory);
     }
-	
-	
-	
-	
-	public void showStage(Pane root) {
-		Scene scene = new Scene(root, 500, 300);
-		stage.setScene(scene);
-		stage.setResizable(false);
-		stage.setTitle("Home");
-		stage.show();
-	}
+
+    private void addToCart(Book book) {
+        model.addBookToCart(book);  // Ensure addBookToCart is defined in Model
+        System.out.println("Added to cart: " + book.getTitle());
+    }
+
+    public void showStage(AnchorPane root) {
+        Scene scene = new Scene(root, 600, 400);  // Adjust the scene size
+        stage.setScene(scene);
+        stage.setResizable(true);  // Allow resizing
+        stage.setTitle("Home");
+        stage.show();
+    }
 }
