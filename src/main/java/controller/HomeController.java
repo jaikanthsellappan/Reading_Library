@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
@@ -29,6 +30,7 @@ import model.User;
 public class HomeController {
     private Model model;
     private Stage stage;
+    private Stage parentStage;
 
     @FXML
     private Label welcomeLabel;  // Label for welcome message
@@ -36,6 +38,8 @@ public class HomeController {
     private MenuItem viewProfile;
     @FXML
     private MenuItem updateProfile;
+    @FXML
+    private MenuItem signOut; 
     @FXML
     private TableView<Book> bookTable;
 
@@ -49,24 +53,36 @@ public class HomeController {
     private TableColumn<Book, Integer> copiesColumn;
     @FXML
     private TableColumn<Book, Void> actionColumn;
+    @FXML
+    private Button cartButton;
+    @FXML
+    private Button ordersButton;
 
     private ObservableList<Book> booksData;
 
     public HomeController(Stage parentStage, Model model) {
         this.stage = new Stage();
+		this.parentStage = parentStage;
         this.model = model;
     }
 
     @FXML
     public void initialize() throws SQLException {
     	// Set column resize policy to prevent extra columns
-        bookTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        
+    	bookTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
         User currentUser = model.getCurrentUser();
         welcomeLabel.setText("Welcome, " + currentUser.getUsername() + "!");  // Set personalized welcome message
 
         viewProfile.setOnAction(event -> viewUserProfile());
         updateProfile.setOnAction(event -> updateUserProfile());
+        signOut.setOnAction(event -> {
+            stage.close();
+            parentStage.show();
+        });
+
+        cartButton.setOnAction(event -> openCart());
+        ordersButton.setOnAction(event -> openOrders());
 
         // Configure table columns
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -79,6 +95,14 @@ public class HomeController {
 
         // Load data into the table
         loadBooksData();
+    }
+
+    private void openCart() {
+        System.out.println("Cart opened"); // Placeholder for cart logic
+    }
+
+    private void openOrders() {
+        System.out.println("Orders opened"); // Placeholder for orders logic
     }
 
     private void loadBooksData() throws SQLException {
@@ -155,6 +179,19 @@ public class HomeController {
         System.out.println("Added to cart: " + book.getTitle());
     }
 
+//    private void handleSignOut() {
+//    	try {
+//            // Close the current Home window
+//    		close.setOnAction(event -> {
+//    			stage.close();
+//    			parentStage.show();
+//    		});
+//            
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+    
     public void showStage(AnchorPane root) {
         Scene scene = new Scene(root, 600, 400);  // Adjust the scene size
         stage.setScene(scene);

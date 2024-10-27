@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -11,35 +12,40 @@
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" prefHeight="450.0" prefWidth="600.0">
-    
-    <!-- VBox to hold the profile menu and welcome label, anchored at the top -->
-    <VBox AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-        <!-- Profile menu -->
+
+    <!-- HBox at the top for the menu, welcome label, and action buttons -->
+    <HBox AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" spacing="10">
+        <!-- Profile Menu on the left -->
         <MenuBar fx:id="menu">
             <menus>
-                <Menu fx:id="profile" mnemonicParsing="false" text="Profile">
+                <Menu fx:id="profile" text="Profile">
                     <items>
-                        <MenuItem fx:id="viewProfile" mnemonicParsing="false" text="View my profile" />
-                        <MenuItem fx:id="updateProfile" mnemonicParsing="false" text="Update my profile" />
+                        <MenuItem fx:id="viewProfile" text="View my profile" />
+                        <MenuItem fx:id="updateProfile" text="Update my profile" />
+                        <MenuItem fx:id="signOut" text="Sign Out" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
 
-        <!-- Centered welcome label in an HBox -->
-        <HBox alignment="CENTER">
-            <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
-        </HBox>
-    </VBox>
+        <!-- Spacer to keep welcome message and buttons aligned on the right -->
+        <HBox fx:id="spacer" HBox.hgrow="ALWAYS" />
 
-    <!-- Centered TableView with "Action" column as the last column -->
+        <!-- Welcome Label in the center -->
+        <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+        <!-- Cart and Orders Buttons on the right -->
+        <Button fx:id="cartButton" text="Cart" />
+        <Button fx:id="ordersButton" text="Orders" />
+    </HBox>
+
+    <!-- Centered TableView with book details and action column -->
     <TableView fx:id="bookTable" AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.bottomAnchor="20.0">
         <columns>
             <TableColumn fx:id="titleColumn" text="Title" prefWidth="150" />
             <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
             <TableColumn fx:id="priceColumn" text="Price (AUD)" prefWidth="100" />
             <TableColumn fx:id="copiesColumn" text="Available Copies" prefWidth="100" />
-            <!-- Action column placed at the end with specific width -->
             <TableColumn fx:id="actionColumn" text="Action" prefWidth="100" />
         </columns>
     </TableView>
