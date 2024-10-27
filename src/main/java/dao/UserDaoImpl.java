@@ -63,4 +63,25 @@ public class UserDaoImpl implements UserDao {
 			return new User(username, password, firstname, lastname, is_admin);
 		} 
 	}
+	
+	@Override
+	public void updateUser(User user) throws SQLException {
+	    String sql = "UPDATE " + TABLE_NAME + " SET firstname = ?, lastname = ?, password = ? WHERE username = ?";
+	    
+	    try (Connection connection = Database.getConnection();
+	         PreparedStatement stmt = connection.prepareStatement(sql)) {
+	        
+	        stmt.setString(1, user.getFirstName());
+	        stmt.setString(2, user.getLastName());
+	        stmt.setString(3, user.getPassword());
+	        stmt.setString(4, user.getUsername());
+	        
+	        stmt.executeUpdate();
+	        if (!connection.getAutoCommit()) {
+	            connection.commit();  // Commit if auto-commit is disabled
+	        }
+	        System.out.println("User profile updated in database: " + user.getUsername());
+	    }
+	}
+	
 }

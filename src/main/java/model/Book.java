@@ -16,6 +16,14 @@ public class Book {
     public String getAuthors() {
         return authors;
     }
+    
+    public int getPhysicalCopies() {  // Add getter for physicalCopies
+        return physicalCopies;
+    }
+
+    public double getPrice() {  // Add getter for price
+        return price;
+    }
 
     public int getSoldCopies() {
         return soldCopies;

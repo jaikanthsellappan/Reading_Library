@@ -45,4 +45,16 @@ public class Model {
 	public void setCurrentUser(User user) {
 		currentUser = user;
 	}
+	
+	public void updateUser(User user) {
+		try {
+			userDao.updateUser(user);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    // Implement the logic to update the user's profile in the database
+	    System.out.println("User profile updated: " + user.getUsername());
+	}
+	
 }

@@ -2,12 +2,15 @@ package controller;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableCell;
@@ -16,6 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Book;
@@ -88,7 +92,33 @@ public class HomeController {
     }
 
     private void updateUserProfile() {
-        System.out.println("Updating profile for: " + model.getCurrentUser().getUsername());
+    	try {
+            // Load the FXML for the Edit Profile dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/EditProfile.fxml"));
+            loader.setController(new EditProfileController(model));
+            
+            VBox editProfilePane = loader.load();
+            
+            // Create a new dialog stage for the Edit Profile window
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Edit Profile");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(stage);
+            
+            // Set the scene and show the dialog
+            Scene scene = new Scene(editProfilePane);
+            dialogStage.setScene(scene);
+            
+            // Set dialog stage to the controller
+            EditProfileController controller = loader.getController();
+            controller.setDialogStage(dialogStage);
+            
+            dialogStage.showAndWait();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    	
     }
 
     private void addButtonToTable() {
