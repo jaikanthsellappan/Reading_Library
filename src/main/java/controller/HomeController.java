@@ -98,7 +98,32 @@ public class HomeController {
     }
 
     private void openCart() {
-        System.out.println("Cart opened"); // Placeholder for cart logic
+        System.out.println("Cart opened"); 
+        try {
+            // Load the FXML for the Cart dialog
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartView.fxml"));
+            
+            // Set the controller for the CartView
+            CartController cartController = new CartController(model);
+            loader.setController(cartController);
+            
+            VBox cartPane = loader.load();
+            
+            // Create a new dialog stage for the Cart window
+            Stage cartStage = new Stage();
+            cartStage.setTitle("My Cart");
+            cartStage.initModality(Modality.WINDOW_MODAL);
+            cartStage.initOwner(stage);
+            
+            // Set the scene and show the dialog
+            Scene scene = new Scene(cartPane);
+            cartStage.setScene(scene);
+            
+            cartStage.showAndWait();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void openOrders() {
@@ -175,7 +200,7 @@ public class HomeController {
     }
 
     private void addToCart(Book book) {
-        model.addBookToCart(book);  // Ensure addBookToCart is defined in Model
+        model.addBookToCart(book, 1, model.getCurrentUser());  // Ensure addBookToCart is defined in Model
         System.out.println("Added to cart: " + book.getTitle());
     }
 

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Book;
+import model.CartItem;
+import model.User;
 
 public class BookDaoImpl implements BookDao{
 	
@@ -31,6 +33,44 @@ public class BookDaoImpl implements BookDao{
             }
         }
         return books;
+    }
+    
+    @Override
+    public void addBookToCart(Book book, int quantity, User user) {
+        try (Connection connection = Database.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                 "INSERT INTO cart (username, book_title, quantity) VALUES (?, ?, ?)")) {
+            
+            stmt.setString(1, user.getUsername());
+            stmt.setString(2, book.getTitle());
+            stmt.setInt(3, quantity);
+            
+            stmt.executeUpdate();
+            System.out.println("Book added to cart: " + book.getTitle());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<CartItem> getCartItems(User user) {
+        List<CartItem> cartItems = new ArrayList<>();
+        String sql = "SELECT * FROM cart WHERE username = ?";
+        
+        try (Connection connection = Database.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+            
+            stmt.setString(1, user.getUsername());
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                CartItem item = new CartItem(rs.getString("book_title"), rs.getInt("quantity"));
+                cartItems.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cartItems;
     }
 
 }

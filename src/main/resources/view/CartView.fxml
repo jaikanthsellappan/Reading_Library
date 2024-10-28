@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" spacing="10" alignment="CENTER" prefWidth="300.0" prefHeight="400.0">
+    <TableView fx:id="cartTable">
+        <columns>
+            <TableColumn fx:id="bookTitleColumn" text="Book Title" prefWidth="200"/>
+            <TableColumn fx:id="quantityColumn" text="Quantity" prefWidth="100"/>
+        </columns>
+    </TableView>
+</VBox>
