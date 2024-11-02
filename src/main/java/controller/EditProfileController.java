@@ -1,5 +1,7 @@
 package controller;
 
+import java.sql.SQLException;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -35,7 +37,7 @@ public class EditProfileController {
     }
 
     @FXML
-    private void handleSave() {
+    private void handleSave() throws SQLException {
         // Update the user's profile with new data
         User currentUser = model.getCurrentUser();
         currentUser.setFirstName(firstNameField.getText());

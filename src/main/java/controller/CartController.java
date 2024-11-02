@@ -3,15 +3,26 @@ package controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.util.Callback;
+import model.Book;
 import model.CartItem;
 import model.Model;
 
+import java.sql.SQLException;
+import java.util.Optional;
+
 public class CartController {
-	
-	private Model model;
+
+    private Model model;
 
     @FXML
     private TableView<CartItem> cartTable;
@@ -19,6 +30,10 @@ public class CartController {
     private TableColumn<CartItem, String> bookTitleColumn;
     @FXML
     private TableColumn<CartItem, Integer> quantityColumn;
+    @FXML
+    private TableColumn<CartItem, Void> actionColumn;
+    @FXML
+    private Button checkoutButton;
 
     public CartController(Model model) {
         this.model = model;
@@ -29,7 +44,10 @@ public class CartController {
         bookTitleColumn.setCellValueFactory(new PropertyValueFactory<>("bookTitle"));
         quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
 
+        addActionButtonsToCart();
         loadCartData();
+
+        checkoutButton.setOnAction(event -> finalizeCheckout());
     }
 
     private void loadCartData() {
@@ -37,4 +55,104 @@ public class CartController {
         cartTable.setItems(cartItems);
     }
 
+    private void addActionButtonsToCart() {
+        Callback<TableColumn<CartItem, Void>, TableCell<CartItem, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<CartItem, Void> call(final TableColumn<CartItem, Void> param) {
+                return new TableCell<>() {
+                    private final Button updateButton = new Button("Update");
+                    private final Button removeButton = new Button("Remove");
+
+                    {
+                        updateButton.setOnAction(event -> {
+                            CartItem item = getTableView().getItems().get(getIndex());
+                            updateCartItemQuantity(item);
+                        });
+
+                        removeButton.setOnAction(event -> {
+                            CartItem item = getTableView().getItems().get(getIndex());
+                            removeCartItem(item);
+                        });
+                    }
+
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            HBox hBox = new HBox(updateButton, removeButton);
+                            hBox.setSpacing(10);
+                            setGraphic(hBox);
+                        }
+                    }
+                };
+            }
+        };
+        actionColumn.setCellFactory(cellFactory);
+    }
+
+    private void updateCartItemQuantity(CartItem cartItem) {
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(cartItem.getQuantity()));
+        dialog.setTitle("Update Quantity");
+        dialog.setHeaderText("Update quantity for " + cartItem.getBookTitle());
+        dialog.setContentText("Enter new quantity:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(quantityStr -> {
+            try {
+                int newQuantity = Integer.parseInt(quantityStr);
+                if (newQuantity <= 0) {
+                    showAlert("Error", "Quantity must be greater than zero.");
+                } else {
+                    Book book = model.getBookByTitle(cartItem.getBookTitle());
+                    int availableStock = model.getBookStock(book);
+
+                    if (newQuantity > availableStock) {
+                        showAlert("Warning", "Only " + availableStock + " copies available for " + book.getTitle());
+                    } else {
+                        model.updateCartItem(model.getCurrentUser(), book, newQuantity);
+                        loadCartData(); // Refresh the cart data
+                    }
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Error", "Invalid quantity entered.");
+            } catch (SQLException e) {
+                showAlert("Error", "An error occurred while fetching book details.");
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void removeCartItem(CartItem cartItem) {
+        Book book = null;
+        try {
+            book = model.getBookByTitle(cartItem.getBookTitle());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        model.removeCartItem(model.getCurrentUser(), book);
+        loadCartData();
+    }
+
+    private void finalizeCheckout() {
+        double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Checkout");
+        alert.setHeaderText("Total Price: $" + totalPrice);
+        alert.setContentText("Do you want to proceed with the checkout?");
+        alert.showAndWait().ifPresent(response -> {
+            // Finalize the checkout process
+            model.finalizeCheckout(model.getCurrentUser());
+            loadCartData(); // Refresh the cart after checkout
+        });
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

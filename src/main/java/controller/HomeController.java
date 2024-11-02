@@ -1,6 +1,8 @@
 package controller;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
 import java.io.IOException;
@@ -198,24 +200,32 @@ public class HomeController {
         };
         actionColumn.setCellFactory(cellFactory);
     }
-
+    
     private void addToCart(Book book) {
-        model.addBookToCart(book, 1, model.getCurrentUser());  // Ensure addBookToCart is defined in Model
-        System.out.println("Added to cart: " + book.getTitle());
+        // Assume that the quantity for adding to the cart is 1 by default.
+        int quantity = 1; 
+        String message = model.addBookToCart(book, quantity, model.getCurrentUser());
+
+        // Show feedback to the user. In a real application, you would use a JavaFX Alert or Label for this.
+        System.out.println(message);
+
+        if (message.startsWith("Warning")) {
+            // Handle the warning message by displaying it to the user.
+            // For example, use a dialog or alert:
+            showAlert("Warning", message);
+        } else {
+            System.out.println("Added to cart: " + book.getTitle());
+        }
     }
 
-//    private void handleSignOut() {
-//    	try {
-//            // Close the current Home window
-//    		close.setOnAction(event -> {
-//    			stage.close();
-//    			parentStage.show();
-//    		});
-//            
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     
     public void showStage(AnchorPane root) {
         Scene scene = new Scene(root, 600, 400);  // Adjust the scene size

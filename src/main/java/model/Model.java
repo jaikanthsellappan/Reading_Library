@@ -11,55 +11,96 @@ import dao.UserDao;
 import dao.UserDaoImpl;
 
 public class Model {
-	private UserDao userDao;
-	private BookDao bookdao;
-	private User currentUser; 
-	
-	public Model() {
-		userDao = new UserDaoImpl();
-		bookdao = new BookDaoImpl();
-	}
-	
-	public void setup() throws SQLException {
-		userDao.setup();
-	}
-	public UserDao getUserDao() {
-		return userDao;
-	}
-	
-	public List<Book> books() throws SQLException {
-		List<Book> books = bookdao.getAllBooks();
+    private UserDao userDao;
+    private BookDao bookdao;
+    private User currentUser; 
+    
+    public Model() {
+        userDao = new UserDaoImpl();
+        bookdao = new BookDaoImpl();
+    }
+    
+    public void setup() throws SQLException {
+        userDao.setup();
+    }
+
+    public UserDao getUserDao() {
+        return userDao;
+    }
+    
+    public List<Book> books() throws SQLException {
+        List<Book> books = bookdao.getAllBooks();
         Collections.sort(books, Comparator.comparingInt(Book::getSoldCopies).reversed());
         return books.subList(0, Math.min(5, books.size())); // Return top 5 or fewer if not enough
-	}
-	
-	public void addBookToCart(Book book, int quantity, User user) {
-        // Implement the logic to add the book to the user's shopping cart
-		bookdao.addBookToCart(book, quantity, user);
-        System.out.println("Book added to cart: " + book.getTitle());
     }
-	
-	public List<CartItem> getCartItems(User user){
-		 return bookdao.getCartItems(user);
+    
+    public String addBookToCart(Book book, int quantity, User user) {
+        int availableStock = bookdao.getBookStock(book);
+        int currentCartQuantity = bookdao.getCartQuantity(user, book);
+        
+        if (currentCartQuantity + quantity > availableStock) {
+            return "Warning: Only " + (availableStock - currentCartQuantity) + " copies available.";
+        } else {
+            bookdao.addBookToCart(book, quantity, user);
+            return "Book added to cart: " + book.getTitle();
+        }
+    }
+    
+    public List<CartItem> getCartItems(User user) {
+        return bookdao.getCartItems(user);
+    }
+    
+    public void updateCartItem(User user, Book book, int newQuantity) {
+        int availableStock = bookdao.getBookStock(book);
+        if (newQuantity > availableStock) {
+            System.out.println("Warning: Only " + availableStock + " copies available for " + book.getTitle());
+        } else {
+            bookdao.updateCartItem(user, book, newQuantity);
+        }
+    }
+
+    public void removeCartItem(User user, Book book) {
+        bookdao.removeCartItem(user, book);
+    }
+
+    public double calculateTotalCartPrice(User user) {
+        List<CartItem> cartItems = bookdao.getCartItems(user);
+        double totalPrice = 0;
+        for (CartItem item : cartItems) {
+            Book book = null;
+			try {
+				book = bookdao.getBookByTitle(item.getBookTitle());
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            totalPrice += book.getPrice() * item.getQuantity();
+        }
+        return totalPrice;
+    }
+    
+    public void finalizeCheckout(User user) {
+    	bookdao.finalizeCheckout(user);
+    }
+    
+    public Book getBookByTitle(String title) throws SQLException {
+		return bookdao.getBookByTitle(title);
+    	
+    }
+    
+    public void updateUser(User user) throws SQLException {
+    	userDao.updateUser(user);
+    }
+
+    public User getCurrentUser() {
+        return this.currentUser;
+    }
+    
+    public void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+	public int getBookStock(Book book) {
+		return bookdao.getBookStock(book);
 	}
-	
-	public User getCurrentUser() {
-		return this.currentUser;
-	}
-	
-	public void setCurrentUser(User user) {
-		currentUser = user;
-	}
-	
-	public void updateUser(User user) {
-		try {
-			userDao.updateUser(user);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    // Implement the logic to update the user's profile in the database
-	    System.out.println("User profile updated: " + user.getUsername());
-	}
-	
 }
