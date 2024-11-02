@@ -5,6 +5,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,11 +23,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import model.Book;
 import model.Model;
+import model.Order;
 import model.User;
 
 public class HomeController {
@@ -134,6 +137,32 @@ public class HomeController {
 
     private void openOrders() {
         System.out.println("Orders opened"); // Placeholder for orders logic
+        try {
+            List<Order> orders = model.getOrders(model.getCurrentUser());
+            // Display orders in a new window or table view
+            // Implementation depends on your UI requirements
+        } catch (SQLException e) {
+            showAlert("Error", "Could not load orders. Please try again.");
+            e.printStackTrace();
+        }
+    }
+    
+    private void exportOrders() {
+        try {
+            List<Order> orders = model.getOrders(model.getCurrentUser());
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save Orders");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            File file = fileChooser.showSaveDialog(stage);
+
+            if (file != null) {
+                model.exportOrdersToCSV(orders, file);
+                showAlert("Export Successful", "Orders exported successfully to " + file.getAbsolutePath());
+            }
+        } catch (IOException | SQLException e) {
+            showAlert("Export Error", "Failed to export orders. Please try again.");
+            e.printStackTrace();
+        }
     }
 
     private void loadBooksData() throws SQLException {

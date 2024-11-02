@@ -1,5 +1,9 @@
 package model;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,6 +13,7 @@ import dao.BookDao;
 import dao.BookDaoImpl;
 import dao.UserDao;
 import dao.UserDaoImpl;
+import model.Order.OrderItem;
 
 public class Model {
     private UserDao userDao;
@@ -82,6 +87,35 @@ public class Model {
     public void finalizeCheckout(User user) {
     	bookdao.finalizeCheckout(user);
     }
+    
+    public void finalizeCheckout(User user, double totalPrice) throws SQLException {
+        String orderNumber = generateOrderNumber();  // Generate a unique order number
+        bookdao.saveOrder(user, orderNumber, totalPrice, getCartItems(user)); // Save order details to database
+        bookdao.finalizeCheckout(user);  // Deduct stock and clear the cart
+    }
+
+    // Helper method to generate unique order number
+    private String generateOrderNumber() {
+        return "ORD" + System.currentTimeMillis();
+    }
+    
+    public List<Order> getOrders(User user) throws SQLException {
+        return bookdao.getOrders(user);
+    }
+
+    public void exportOrdersToCSV(List<Order> orders, File file) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write("Order Number,Date,Total Price,Book Title,Quantity\n");
+            for (Order order : orders) {
+                for (OrderItem item : order.getItems()) {
+                    writer.write(String.format("%s,%s,%.2f,%s,%d\n",
+                            order.getOrderNumber(), order.getOrderDate(), order.getTotalPrice(),
+                            item.getBookTitle(), item.getQuantity()));
+                }
+            }
+        }
+    }
+
     
     public Book getBookByTitle(String title) throws SQLException {
 		return bookdao.getBookByTitle(title);

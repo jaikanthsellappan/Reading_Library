@@ -144,31 +144,64 @@ public class CartController {
                 int availableStock = model.getBookStock(book);
 
                 if (item.getQuantity() > availableStock) {
-                    // Show alert and stop the checkout if stock is insufficient
                     showAlert("Checkout Error", "Insufficient stock for " + book.getTitle() + ". Only " + availableStock + " copies available.");
                     return;
                 }
             }
 
-            // If all items have sufficient stock, proceed with checkout
+            // Collect payment information
+            TextInputDialog cardDialog = new TextInputDialog();
+            cardDialog.setTitle("Payment");
+            cardDialog.setHeaderText("Enter your payment details");
+
+            // Collect and validate card number
+            cardDialog.setContentText("Card Number (16 digits):");
+            Optional<String> cardNumber = cardDialog.showAndWait();
+            if (!cardNumber.isPresent() || !cardNumber.get().matches("\\d{16}")) {
+                showAlert("Payment Error", "Invalid card number. It must be 16 digits.");
+                return;
+            }
+
+            // Collect and validate expiry date
+            cardDialog.setContentText("Expiry Date (MM/YY):");
+            Optional<String> expiryDate = cardDialog.showAndWait();
+            if (!expiryDate.isPresent() || !isFutureDate(expiryDate.get())) {
+                showAlert("Payment Error", "Invalid expiry date. It must be a future date.");
+                return;
+            }
+
+            // Collect and validate CVV
+            cardDialog.setContentText("CVV (3 digits):");
+            Optional<String> cvv = cardDialog.showAndWait();
+            if (!cvv.isPresent() || !cvv.get().matches("\\d{3}")) {
+                showAlert("Payment Error", "Invalid CVV. It must be 3 digits.");
+                return;
+            }
+
+            // If payment is valid, proceed with the checkout
             double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
             Alert alert = new Alert(AlertType.CONFIRMATION);
             alert.setTitle("Checkout");
             alert.setHeaderText("Total Price: $" + totalPrice);
-            alert.setContentText("Do you want to proceed with the checkout?");
+            alert.setContentText("Do you want to confirm the order?");
             
-            // If user confirms, finalize checkout
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                model.finalizeCheckout(model.getCurrentUser());
+                model.finalizeCheckout(model.getCurrentUser(), totalPrice);
                 showAlert("Checkout Successful", "Your order has been placed successfully.");
                 loadCartData(); // Refresh the cart after checkout
             }
-
         } catch (SQLException e) {
             showAlert("Checkout Error", "An error occurred during checkout. Please try again.");
             e.printStackTrace();
         }
+    }
+
+    // Helper method to validate future expiry date
+    private boolean isFutureDate(String expiryDate) {
+        // Implement your date validation logic here
+        // Example: Parse and check if the date is in the future
+        return true; // Placeholder
     }
     	
     private void showAlert(String title, String message) {

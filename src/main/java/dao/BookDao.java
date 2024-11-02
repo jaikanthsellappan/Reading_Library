@@ -5,6 +5,7 @@ import java.util.List;
 
 import model.Book;
 import model.CartItem;
+import model.Order;
 import model.User;
 
 public interface BookDao {
@@ -19,5 +20,7 @@ public interface BookDao {
 	public void clearUserCart(User user);
 	Book getBookByTitle(String title) throws SQLException;
     void updateBookStock(Book book, int newStock) throws SQLException;
+    void saveOrder(User user, String orderNumber, double totalPrice, List<CartItem> cartItems) throws SQLException;
+    List<Order> getOrders(User user) throws SQLException;
 
 }

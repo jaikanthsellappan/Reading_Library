@@ -6,6 +6,8 @@ import java.util.List;
 
 import model.Book;
 import model.CartItem;
+import model.Order;
+import model.Order.OrderItem;
 import model.User;
 
 public class BookDaoImpl implements BookDao{
@@ -188,6 +190,68 @@ public class BookDaoImpl implements BookDao{
             e.printStackTrace();
         }
         return cartItems;
+    }
+    
+    
+    @Override
+    public void saveOrder(User user, String orderNumber, double totalPrice, List<CartItem> cartItems) throws SQLException {
+        String orderSql = "INSERT INTO orders (order_number, username, total_price, order_date) VALUES (?, ?, ?, CURRENT_TIMESTAMP)";
+        String orderItemSql = "INSERT INTO order_items (order_number, book_title, quantity) VALUES (?, ?, ?)";
+        
+        try (Connection connection = Database.getConnection()) {
+            try (PreparedStatement orderStmt = connection.prepareStatement(orderSql);
+                 PreparedStatement orderItemStmt = connection.prepareStatement(orderItemSql)) {
+
+                // Insert order into orders table
+                orderStmt.setString(1, orderNumber);
+                orderStmt.setString(2, user.getUsername());
+                orderStmt.setDouble(3, totalPrice);
+                orderStmt.executeUpdate();
+
+                // Insert each item in the cart into order_items table
+                for (CartItem item : cartItems) {
+                    orderItemStmt.setString(1, orderNumber);
+                    orderItemStmt.setString(2, item.getBookTitle());
+                    orderItemStmt.setInt(3, item.getQuantity());
+                    orderItemStmt.addBatch();
+                }
+                orderItemStmt.executeBatch();
+            }
+        }
+    }
+    
+    @Override
+    public List<Order> getOrders(User user) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        String orderSql = "SELECT * FROM orders WHERE username = ? ORDER BY order_date DESC";
+        String orderItemsSql = "SELECT * FROM order_items WHERE order_number = ?";
+
+        try (Connection connection = Database.getConnection();
+             PreparedStatement orderStmt = connection.prepareStatement(orderSql);
+             PreparedStatement orderItemsStmt = connection.prepareStatement(orderItemsSql)) {
+
+            orderStmt.setString(1, user.getUsername());
+            try (ResultSet rs = orderStmt.executeQuery()) {
+                while (rs.next()) {
+                    String orderNumber = rs.getString("order_number");
+                    double totalPrice = rs.getDouble("total_price");
+                    Timestamp orderDate = rs.getTimestamp("order_date");
+
+                    // Retrieve items for the order
+                    orderItemsStmt.setString(1, orderNumber);
+                    List<OrderItem> items = new ArrayList<>();
+                    try (ResultSet itemRs = orderItemsStmt.executeQuery()) {
+                        while (itemRs.next()) {
+                            String bookTitle = itemRs.getString("book_title");
+                            int quantity = itemRs.getInt("quantity");
+                            items.add(new OrderItem(bookTitle, quantity));
+                        }
+                    }
+                    orders.add(new Order(orderNumber, totalPrice, orderDate, items));
+                }
+            }
+        }
+        return orders;
     }
 
 }
