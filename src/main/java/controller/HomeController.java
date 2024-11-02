@@ -185,8 +185,27 @@ public class HomeController {
     }
 
     private void viewUserProfile() {
-        User user = model.getCurrentUser();
-        System.out.println("Viewing profile for: " + user.getUsername());
+    	try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/UserProfileView.fxml"));
+            
+            // Pass current user data to the controller
+            UserProfileController userProfileController = new UserProfileController(model.getCurrentUser());
+            loader.setController(userProfileController);
+            
+            Parent root = loader.load();
+            
+            Stage profileStage = new Stage();
+            userProfileController.setStage(profileStage);
+            profileStage.setTitle("User Profile");
+            profileStage.setScene(new Scene(root));
+            profileStage.initModality(Modality.WINDOW_MODAL);
+            profileStage.initOwner(stage);
+            profileStage.showAndWait();
+            
+        } catch (IOException e) {
+            showAlert("Error", "Unable to load profile view.");
+            e.printStackTrace();
+        }
     }
 
     private void updateUserProfile() {
