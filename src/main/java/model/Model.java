@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -104,14 +105,15 @@ public class Model {
     }
 
     public void exportOrdersToCSV(List<Order> orders, File file) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("Order Number,Date,Total Price,Book Title,Quantity\n");
+    	try (PrintWriter writer = new PrintWriter(file)) {
+            writer.println("Order Number,Date,Total Price,Books");
+
             for (Order order : orders) {
-                for (OrderItem item : order.getItems()) {
-                    writer.write(String.format("%s,%s,%.2f,%s,%d\n",
-                            order.getOrderNumber(), order.getOrderDate(), order.getTotalPrice(),
-                            item.getBookTitle(), item.getQuantity()));
-                }
+                writer.printf("%s,%s,%.2f,%s\n",
+                    order.getOrderNumber(),
+                    order.getOrderDate(),
+                    order.getTotalPrice(),
+                    order.getBookDetails());
             }
         }
     }

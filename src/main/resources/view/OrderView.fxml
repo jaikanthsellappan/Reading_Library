@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" spacing="10" alignment="CENTER">
+    <TableView fx:id="orderTable">
+        <columns>
+            <TableColumn fx:id="orderNumberColumn" text="Order Number" prefWidth="150"/>
+            <TableColumn fx:id="dateColumn" text="Date" prefWidth="150"/>
+            <TableColumn fx:id="totalPriceColumn" text="Total Price" prefWidth="100"/>
+            <TableColumn fx:id="bookDetailsColumn" text="Books" prefWidth="200"/>
+        </columns>
+    </TableView>
+</VBox>

@@ -7,7 +7,7 @@ public class Order {
     private String orderNumber;
     private double totalPrice;
     private Timestamp orderDate;
-    private List<OrderItem> items; // List of items in this order
+    private static List<OrderItem> items; // List of items in this order
 
     // Constructor to initialize an order with all attributes
     public Order(String orderNumber, double totalPrice, Timestamp orderDate, List<OrderItem> items) {
@@ -64,6 +64,8 @@ public class Order {
         public int getQuantity() {
             return quantity;
         }
+        
+        
 
         @Override
         public String toString() {
@@ -73,4 +75,17 @@ public class Order {
                     '}';
         }
     }
+
+	public String getBookDetails() {
+		StringBuilder bookDetails = new StringBuilder();
+	    for (OrderItem item : items) {
+	        bookDetails.append(item.getBookTitle())
+	                   .append(" (Qty: ").append(item.getQuantity()).append("), ");
+	    }
+	    // Remove the last comma and space
+	    if (bookDetails.length() > 0) {
+	        bookDetails.setLength(bookDetails.length() - 2);
+	    }
+	    return bookDetails.toString();
+	}
 }

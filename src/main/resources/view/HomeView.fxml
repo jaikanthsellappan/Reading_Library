@@ -37,6 +37,7 @@
         <!-- Cart and Orders Buttons on the right -->
         <Button fx:id="cartButton" text="Cart" />
         <Button fx:id="ordersButton" text="Orders" />
+        <Button fx:id="exportOrdersButton" text="Export Orders" onAction="#exportOrders" />
     </HBox>
 
     <!-- Centered TableView with book details and action column -->

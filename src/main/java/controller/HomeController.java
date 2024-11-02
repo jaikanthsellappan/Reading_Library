@@ -47,7 +47,8 @@ public class HomeController {
     private MenuItem signOut; 
     @FXML
     private TableView<Book> bookTable;
-
+    @FXML
+    private Button exportOrdersButton;
     @FXML
     private TableColumn<Book, String> titleColumn;
     @FXML
@@ -139,14 +140,27 @@ public class HomeController {
         System.out.println("Orders opened"); // Placeholder for orders logic
         try {
             List<Order> orders = model.getOrders(model.getCurrentUser());
-            // Display orders in a new window or table view
-            // Implementation depends on your UI requirements
-        } catch (SQLException e) {
+            if (orders.isEmpty()) {
+                showAlert("Orders", "You have no orders.");
+            } else {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/OrderView.fxml"));
+                loader.setController(new OrderController(orders));
+                Parent root = loader.load();
+
+                Stage stage = new Stage();
+                stage.setTitle("Order History");
+                stage.setScene(new Scene(root));
+                stage.initModality(Modality.WINDOW_MODAL);
+                stage.initOwner(this.stage);
+                stage.showAndWait();
+            }
+        } catch (SQLException | IOException e) {
             showAlert("Error", "Could not load orders. Please try again.");
             e.printStackTrace();
         }
     }
     
+    @FXML
     private void exportOrders() {
         try {
             List<Order> orders = model.getOrders(model.getCurrentUser());
