@@ -148,6 +148,15 @@ public class CartController {
                     return;
                 }
             }
+            
+         // If payment is valid, proceed with the checkout
+            double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Checkout");
+            alert.setHeaderText("Total Price: $" + totalPrice);
+            alert.setContentText("Do you want to confirm the order?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
 
             // Collect payment information
             TextInputDialog cardDialog = new TextInputDialog();
@@ -177,16 +186,9 @@ public class CartController {
                 showAlert("Payment Error", "Invalid CVV. It must be 3 digits.");
                 return;
             }
-
-            // If payment is valid, proceed with the checkout
-            double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
-            Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Checkout");
-            alert.setHeaderText("Total Price: $" + totalPrice);
-            alert.setContentText("Do you want to confirm the order?");
             
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
+//            Optional<ButtonType> result = alert.showAndWait();
+//            if (result.isPresent() && result.get() == ButtonType.OK) {
                 model.finalizeCheckout(model.getCurrentUser(), totalPrice);
                 showAlert("Checkout Successful", "Your order has been placed successfully.");
                 loadCartData(); // Refresh the cart after checkout
