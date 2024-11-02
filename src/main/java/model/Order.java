@@ -7,7 +7,7 @@ public class Order {
     private String orderNumber;
     private double totalPrice;
     private Timestamp orderDate;
-    private static List<OrderItem> items; // List of items in this order
+    private List<OrderItem> items; // List of items in this order
 
     // Constructor to initialize an order with all attributes
     public Order(String orderNumber, double totalPrice, Timestamp orderDate, List<OrderItem> items) {
