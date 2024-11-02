@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -136,18 +137,40 @@ public class CartController {
     }
 
     private void finalizeCheckout() {
-        double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("Checkout");
-        alert.setHeaderText("Total Price: $" + totalPrice);
-        alert.setContentText("Do you want to proceed with the checkout?");
-        alert.showAndWait().ifPresent(response -> {
-            // Finalize the checkout process
-            model.finalizeCheckout(model.getCurrentUser());
-            loadCartData(); // Refresh the cart after checkout
-        });
-    }
+    	try {
+            // Check if all items in the cart have sufficient stock
+            for (CartItem item : model.getCartItems(model.getCurrentUser())) {
+                Book book = model.getBookByTitle(item.getBookTitle());
+                int availableStock = model.getBookStock(book);
 
+                if (item.getQuantity() > availableStock) {
+                    // Show alert and stop the checkout if stock is insufficient
+                    showAlert("Checkout Error", "Insufficient stock for " + book.getTitle() + ". Only " + availableStock + " copies available.");
+                    return;
+                }
+            }
+
+            // If all items have sufficient stock, proceed with checkout
+            double totalPrice = model.calculateTotalCartPrice(model.getCurrentUser());
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Checkout");
+            alert.setHeaderText("Total Price: $" + totalPrice);
+            alert.setContentText("Do you want to proceed with the checkout?");
+            
+            // If user confirms, finalize checkout
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                model.finalizeCheckout(model.getCurrentUser());
+                showAlert("Checkout Successful", "Your order has been placed successfully.");
+                loadCartData(); // Refresh the cart after checkout
+            }
+
+        } catch (SQLException e) {
+            showAlert("Checkout Error", "An error occurred during checkout. Please try again.");
+            e.printStackTrace();
+        }
+    }
+    	
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);

@@ -113,22 +113,15 @@ public class BookDaoImpl implements BookDao{
     }
 
     public void finalizeCheckout(User user) {
-        List<CartItem> cartItems = getCartItems(user);
+    	List<CartItem> cartItems = getCartItems(user);
         for (CartItem item : cartItems) {
-            Book book = null;
-			try {
-				book = getBookByTitle(item.getBookTitle());
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            int newStock = book.getPhysicalCopies() - item.getQuantity();
             try {
-				updateBookStock(book, newStock);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                Book book = getBookByTitle(item.getBookTitle());
+                int newStock = book.getPhysicalCopies() - item.getQuantity();
+                updateBookStock(book, newStock);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         clearUserCart(user);
     }
@@ -155,7 +148,7 @@ public class BookDaoImpl implements BookDao{
 
     @Override
     public void updateBookStock(Book book, int newStock) throws SQLException {
-        String sql = "UPDATE " + TABLE_NAME + " SET physical_copies = ? WHERE title = ?";
+    	String sql = "UPDATE books SET physical_copies = ? WHERE title = ?";
         try (Connection connection = Database.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, newStock);

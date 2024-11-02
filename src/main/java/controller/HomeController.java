@@ -100,7 +100,7 @@ public class HomeController {
     }
 
     private void openCart() {
-        System.out.println("Cart opened"); 
+    	System.out.println("Cart opened"); 
         try {
             // Load the FXML for the Cart dialog
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartView.fxml"));
@@ -121,9 +121,13 @@ public class HomeController {
             Scene scene = new Scene(cartPane);
             cartStage.setScene(scene);
             
+            // Show the cart stage and wait for it to close
             cartStage.showAndWait();
             
-        } catch (IOException e) {
+            // After closing the cart, reload the book data in the home page
+            loadBooksData();
+
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
         }
     }
