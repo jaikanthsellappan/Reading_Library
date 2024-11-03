@@ -22,6 +22,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -83,8 +84,26 @@ public class HomeController {
         viewProfile.setOnAction(event -> viewUserProfile());
         updateProfile.setOnAction(event -> updateUserProfile());
         signOut.setOnAction(event -> {
-            stage.close();
-            parentStage.show();
+        	try {
+                // Load Login View
+        		FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
+                LoginController loginController = new LoginController(parentStage, model); // Set controller for LoginView
+                loader.setController(loginController);
+
+                // Load the LoginView and set it on the parent stage
+                GridPane loginRoot = loader.load(); // Adjusted to match GridPane root in FXML
+                Scene loginScene = new Scene(loginRoot);
+
+                parentStage.setScene(loginScene);
+                parentStage.setTitle("Login");
+                parentStage.show();
+
+                // Close the current stage (if needed)
+                stage.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         cartButton.setOnAction(event -> openCart());
