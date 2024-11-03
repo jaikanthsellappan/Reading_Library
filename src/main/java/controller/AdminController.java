@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import model.Book;
 import model.Model;
@@ -85,14 +86,19 @@ public class AdminController {
 
     private void handleSignOut() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
+        	FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
             LoginController loginController = new LoginController(stage, model);
             loader.setController(loginController);
-            AnchorPane loginRoot = loader.load();
+
+            // Load LoginView as GridPane (or change to the correct root type)
+            GridPane loginRoot = loader.load();  // Adjusted to match GridPane root
             Scene scene = new Scene(loginRoot);
+
+            // Set the scene to the main stage and update title
             stage.setScene(scene);
             stage.setTitle("Login");
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
