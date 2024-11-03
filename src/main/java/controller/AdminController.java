@@ -146,11 +146,11 @@ public class AdminController {
     }
 
     private void viewUserProfile() {
-        // Placeholder for view profile logic
+        // no action required
     }
 
     private void updateUserProfile() {
-        // Placeholder for update profile logic
+        // no action required
     }
 
     private void showAlert(String title, String message) {

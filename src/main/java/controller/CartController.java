@@ -19,6 +19,9 @@ import model.CartItem;
 import model.Model;
 
 import java.sql.SQLException;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 public class CartController {
@@ -186,9 +189,7 @@ public class CartController {
                 showAlert("Payment Error", "Invalid CVV. It must be 3 digits.");
                 return;
             }
-            
-//            Optional<ButtonType> result = alert.showAndWait();
-//            if (result.isPresent() && result.get() == ButtonType.OK) {
+       
                 model.finalizeCheckout(model.getCurrentUser(), totalPrice);
                 showAlert("Checkout Successful", "Your order has been placed successfully.");
                 loadCartData(); // Refresh the cart after checkout
@@ -201,9 +202,23 @@ public class CartController {
 
     // Helper method to validate future expiry date
     private boolean isFutureDate(String expiryDate) {
-        // Implement your date validation logic here
-        // Example: Parse and check if the date is in the future
-        return true; // Placeholder
+    	try {
+            // Define date format for expiry date (MM/YY)
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
+            
+            // Parse expiry date as YearMonth
+            YearMonth parsedExpiryDate = YearMonth.parse(expiryDate, formatter);
+            
+            // Get the current YearMonth
+            YearMonth currentYearMonth = YearMonth.now();
+            
+            // Check if the expiry date is in the future
+            return parsedExpiryDate.isAfter(currentYearMonth);
+        } catch (DateTimeParseException e) {
+            // Invalid date format entered
+            showAlert("Payment Error", "Invalid expiry date format. Please use MM/YY format.");
+            return false;
+        }
     }
     	
     private void showAlert(String title, String message) {

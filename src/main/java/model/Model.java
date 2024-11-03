@@ -1,8 +1,6 @@
 package model;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -14,7 +12,6 @@ import dao.BookDao;
 import dao.BookDaoImpl;
 import dao.UserDao;
 import dao.UserDaoImpl;
-import model.Order.OrderItem;
 
 public class Model {
     private UserDao userDao;

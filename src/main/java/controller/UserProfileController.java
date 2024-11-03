@@ -12,8 +12,6 @@ public class UserProfileController {
     private Label firstnameLabel;
     @FXML
     private Label lastnameLabel;
-    @FXML
-    private Label emailLabel;  // Assuming email is part of the User class
     
     private Stage stage;
 	private User user;
@@ -28,7 +26,6 @@ public class UserProfileController {
         usernameLabel.setText(user.getUsername());
         firstnameLabel.setText(user.getFirstName());
         lastnameLabel.setText(user.getLastName());
-        //emailLabel.setText(user.getEmail()); // Update accordingly
     }
 
     @FXML

@@ -68,104 +68,108 @@ public class HomeController {
     private ObservableList<Book> booksData;
 
     public HomeController(Stage parentStage, Model model) {
-        this.stage = new Stage();
-		this.parentStage = parentStage;
-        this.model = model;
+        this.stage = new Stage(); // Initialize new stage for HomeController
+        this.parentStage = parentStage; // Set parent stage reference for sign-out action
+        this.model = model; // Reference to model for data access
     }
 
     @FXML
     public void initialize() throws SQLException {
-    	// Set column resize policy to prevent extra columns
-    	bookTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        // Adjust column resizing policy to prevent empty columns from appearing
+        bookTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
+        // Retrieve current user and set personalized welcome message
         User currentUser = model.getCurrentUser();
-        welcomeLabel.setText("Welcome, " + currentUser.getUsername() + "!");  // Set personalized welcome message
+        welcomeLabel.setText("Welcome, " + currentUser.getUsername() + "!");
 
+        // Assign event handlers for menu items
         viewProfile.setOnAction(event -> viewUserProfile());
         updateProfile.setOnAction(event -> updateUserProfile());
         signOut.setOnAction(event -> {
-        	try {
-                // Load Login View
-        		FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
-                LoginController loginController = new LoginController(parentStage, model); // Set controller for LoginView
+            try {
+                // Load Login View and set it on the parent stage
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/LoginView.fxml"));
+                LoginController loginController = new LoginController(parentStage, model);
                 loader.setController(loginController);
 
                 // Load the LoginView and set it on the parent stage
-                GridPane loginRoot = loader.load(); // Adjusted to match GridPane root in FXML
+                GridPane loginRoot = loader.load();
                 Scene loginScene = new Scene(loginRoot);
 
+                // Set the Login scene and show the parent stage
                 parentStage.setScene(loginScene);
                 parentStage.setTitle("Login");
                 parentStage.show();
 
-                // Close the current stage (if needed)
+                // Close the current HomeController stage
                 stage.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Print error if loading Login view fails
             }
         });
 
+        // Set up event handlers for the cart and orders buttons
         cartButton.setOnAction(event -> openCart());
         ordersButton.setOnAction(event -> openOrders());
 
-        // Configure table columns
+        // Set up cell value factories for table columns
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorsColumn.setCellValueFactory(new PropertyValueFactory<>("authors"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         copiesColumn.setCellValueFactory(new PropertyValueFactory<>("physicalCopies"));
 
-        // Add button to each row in action column
+        // Configure action column with add-to-cart button for each row
         addButtonToTable();
 
-        // Load data into the table
+        // Load book data into the table
         loadBooksData();
     }
 
     private void openCart() {
-    	System.out.println("Cart opened"); 
+        System.out.println("Cart opened");
         try {
-            // Load the FXML for the Cart dialog
+            // Load Cart View and set controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CartView.fxml"));
-            
-            // Set the controller for the CartView
             CartController cartController = new CartController(model);
             loader.setController(cartController);
-            
+
+            // Load cart pane and set scene
             VBox cartPane = loader.load();
-            
-            // Create a new dialog stage for the Cart window
             Stage cartStage = new Stage();
             cartStage.setTitle("My Cart");
             cartStage.initModality(Modality.WINDOW_MODAL);
             cartStage.initOwner(stage);
-            
-            // Set the scene and show the dialog
+
             Scene scene = new Scene(cartPane);
             cartStage.setScene(scene);
-            
-            // Show the cart stage and wait for it to close
+
+            // Show cart stage as a dialog and wait for it to close
             cartStage.showAndWait();
-            
-            // After closing the cart, reload the book data in the home page
+
+            // Reload book data after cart interaction
             loadBooksData();
 
         } catch (IOException | SQLException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // Print error if loading cart view fails
         }
     }
 
     private void openOrders() {
-        System.out.println("Orders opened"); // Placeholder for orders logic
+        System.out.println("Orders opened");
         try {
+            // Retrieve current user's orders
             List<Order> orders = model.getOrders(model.getCurrentUser());
             if (orders.isEmpty()) {
+                // Show alert if no orders found
                 showAlert("Orders", "You have no orders.");
             } else {
+                // Load Order View and set controller
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/OrderView.fxml"));
                 loader.setController(new OrderController(orders));
                 Parent root = loader.load();
 
+                // Create new stage for order history
                 Stage stage = new Stage();
                 stage.setTitle("Order History");
                 stage.setScene(new Scene(root));
@@ -178,10 +182,11 @@ public class HomeController {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     private void exportOrders() {
         try {
+            // Retrieve orders and show file chooser for export destination
             List<Order> orders = model.getOrders(model.getCurrentUser());
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save Orders");
@@ -189,6 +194,7 @@ public class HomeController {
             File file = fileChooser.showSaveDialog(stage);
 
             if (file != null) {
+                // Export orders to chosen CSV file
                 model.exportOrdersToCSV(orders, file);
                 showAlert("Export Successful", "Orders exported successfully to " + file.getAbsolutePath());
             }
@@ -199,20 +205,20 @@ public class HomeController {
     }
 
     private void loadBooksData() throws SQLException {
+        // Fetch book data from model and display in TableView
         booksData = FXCollections.observableArrayList(model.books());
         bookTable.setItems(booksData);
     }
 
     private void viewUserProfile() {
-    	try {
+        try {
+            // Load User Profile View and set controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/UserProfileView.fxml"));
-            
-            // Pass current user data to the controller
             UserProfileController userProfileController = new UserProfileController(model.getCurrentUser());
             loader.setController(userProfileController);
-            
+
+            // Show user profile in a new modal stage
             Parent root = loader.load();
-            
             Stage profileStage = new Stage();
             userProfileController.setStage(profileStage);
             profileStage.setTitle("User Profile");
@@ -220,7 +226,7 @@ public class HomeController {
             profileStage.initModality(Modality.WINDOW_MODAL);
             profileStage.initOwner(stage);
             profileStage.showAndWait();
-            
+
         } catch (IOException e) {
             showAlert("Error", "Unable to load profile view.");
             e.printStackTrace();
@@ -228,36 +234,33 @@ public class HomeController {
     }
 
     private void updateUserProfile() {
-    	try {
-            // Load the FXML for the Edit Profile dialog
+        try {
+            // Load Edit Profile View and set controller
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/EditProfile.fxml"));
             loader.setController(new EditProfileController(model));
-            
+
+            // Show edit profile pane in a new dialog stage
             VBox editProfilePane = loader.load();
-            
-            // Create a new dialog stage for the Edit Profile window
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Edit Profile");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(stage);
-            
-            // Set the scene and show the dialog
+
             Scene scene = new Scene(editProfilePane);
             dialogStage.setScene(scene);
-            
-            // Set dialog stage to the controller
+
             EditProfileController controller = loader.getController();
             controller.setDialogStage(dialogStage);
-            
+
             dialogStage.showAndWait();
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-    	
     }
 
     private void addButtonToTable() {
+        // Define a button cell for the action column in TableView
         Callback<TableColumn<Book, Void>, TableCell<Book, Void>> cellFactory = new Callback<>() {
             @Override
             public TableCell<Book, Void> call(final TableColumn<Book, Void> param) {
@@ -266,6 +269,7 @@ public class HomeController {
 
                     {
                         addButton.setOnAction(event -> {
+                            // Get the selected book and add to cart
                             Book book = getTableView().getItems().get(getIndex());
                             addToCart(book);
                         });
@@ -274,29 +278,20 @@ public class HomeController {
                     @Override
                     public void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(addButton);
-                        }
+                        setGraphic(empty ? null : addButton); // Set button if row is not empty
                     }
                 };
             }
         };
-        actionColumn.setCellFactory(cellFactory);
+        actionColumn.setCellFactory(cellFactory); // Set cell factory for action column
     }
-    
+
     private void addToCart(Book book) {
-        // Assume that the quantity for adding to the cart is 1 by default.
-        int quantity = 1; 
+        int quantity = 1; // Default quantity for cart addition
         String message = model.addBookToCart(book, quantity, model.getCurrentUser());
 
-        // Show feedback to the user. In a real application, you would use a JavaFX Alert or Label for this.
-        System.out.println(message);
-
         if (message.startsWith("Warning")) {
-            // Handle the warning message by displaying it to the user.
-            // For example, use a dialog or alert:
+            // Show warning message if addition is restricted
             showAlert("Warning", message);
         } else {
             System.out.println("Added to cart: " + book.getTitle());
@@ -311,11 +306,10 @@ public class HomeController {
         alert.showAndWait();
     }
 
-    
     public void showStage(AnchorPane root) {
-        Scene scene = new Scene(root, 600, 400);  // Adjust the scene size
+        Scene scene = new Scene(root, 600, 400);  // Set scene size
         stage.setScene(scene);
-        stage.setResizable(true);  // Allow resizing
+        stage.setResizable(true);  // Allow stage resizing
         stage.setTitle("Home");
         stage.show();
     }
