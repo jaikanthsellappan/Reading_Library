@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" prefHeight="450.0" prefWidth="600.0" >
+    <!-- HBox at the top for the menu, welcome label, and action buttons -->
+    <HBox AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" spacing="10">
+        <!-- Profile Menu on the left -->
+        <MenuBar fx:id="menu">
+            <menus>
+                <Menu fx:id="profile" text="Profile">
+                    <items>
+                        <MenuItem fx:id="viewProfile" text="View my profile" />
+                        <MenuItem fx:id="updateProfile" text="Update my profile" />
+                        <MenuItem fx:id="signOut" text="Sign Out" />
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+
+        <!-- Spacer to keep welcome message and buttons aligned on the right -->
+        <HBox fx:id="spacer" HBox.hgrow="ALWAYS" />
+
+        <!-- Welcome Label in the center -->
+        <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+    </HBox>
+
+    <!-- Centered TableView with book details and action column -->
+    <TableView fx:id="bookTable" AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.bottomAnchor="60.0">
+        <columns>
+            <TableColumn fx:id="titleColumn" text="Title" prefWidth="150" />
+            <TableColumn fx:id="authorsColumn" text="Authors" prefWidth="150" />
+            <TableColumn fx:id="priceColumn" text="Price (AUD)" prefWidth="100" />
+            <TableColumn fx:id="soldCopiesColumn" text="Sold Copies" prefWidth="100" />
+            <TableColumn fx:id="stockColumn" text="Available Stock" prefWidth="100" />
+        </columns>
+    </TableView>
+
+    <!-- Buttons for increasing and decreasing stock at the bottom -->
+    <Button fx:id="increaseStockButton" text="Increase Stock" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="50.0" />
+    <Button fx:id="decreaseStockButton" text="Decrease Stock" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="180.0" />
+</AnchorPane>

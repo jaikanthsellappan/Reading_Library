@@ -18,6 +18,8 @@ public class User {
         this.isAdmin = isAdmin;
 	}
 
+	
+	
 	public String getUsername() {
 		return username;
 	}
@@ -52,6 +54,10 @@ public class User {
 	}
     public void setLastName(String lastName) {
     	this.lastName = lastName; 
+    }
+    
+    public void setisAdmin(Boolean admin) {
+    	this.isAdmin = admin; 
     }
 	
 }

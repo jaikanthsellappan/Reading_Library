@@ -103,6 +103,10 @@ public class Model {
     public List<Order> getOrders(User user) throws SQLException {
         return bookdao.getOrders(user);
     }
+    
+    public void updateBookStock(Book book, int newStock) throws SQLException {
+        bookdao.updateBookStock(book, newStock);
+    }
 
     public void exportOrdersToCSV(List<Order> orders, File file) throws IOException {
     	try (PrintWriter writer = new PrintWriter(file)) {

@@ -11,12 +11,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import model.Model;
 import model.User;
 
@@ -34,12 +32,12 @@ public class LoginController {
 
 	private Model model;
 	private Stage stage;
-	
+
 	public LoginController(Stage stage, Model model) {
 		this.stage = stage;
 		this.model = model;
 	}
-	
+
 	@FXML
 	public void initialize() {		
 		login.setOnAction(event -> {
@@ -50,27 +48,35 @@ public class LoginController {
 					if (user != null) {
 						model.setCurrentUser(user);
 						try {
-							FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/HomeView.fxml"));
-							HomeController homeController = new HomeController(stage, model);
-							
-							loader.setController(homeController);
+							FXMLLoader loader;
+							if (user.isAdmin()) {
+								// Redirect to Admin Dashboard if user is an admin
+								loader = new FXMLLoader(getClass().getResource("/view/AdminDashboard.fxml"));
+								AdminController adminController = new AdminController(stage, model);
+								loader.setController(adminController);
+							} else {
+								// Redirect to HomeView for regular user
+								loader = new FXMLLoader(getClass().getResource("/view/HomeView.fxml"));
+								HomeController homeController = new HomeController(stage, model);
+								loader.setController(homeController);
+							}
 							AnchorPane root = loader.load();
-	
-							homeController.showStage(root);
-							stage.close();
-						}catch (IOException e) {
-							message.setText(e.getMessage());
+							Scene scene = new Scene(root);
+							stage.setScene(scene);
+							stage.setTitle(user.isAdmin() ? "Admin Dashboard" : "Home");
+							stage.show();
+						} catch (IOException e) {
+							message.setText("Error loading view: " + e.getMessage());
+							message.setTextFill(Color.RED);
 						}
-						
 					} else {
 						message.setText("Wrong username or password");
 						message.setTextFill(Color.RED);
 					}
 				} catch (SQLException e) {
-					message.setText(e.getMessage());
+					message.setText("Database error: " + e.getMessage());
 					message.setTextFill(Color.RED);
 				}
-				
 			} else {
 				message.setText("Empty username or password");
 				message.setTextFill(Color.RED);
@@ -82,25 +88,21 @@ public class LoginController {
 		signup.setOnAction(event -> {
 			try {
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/SignupView.fxml"));
-				
-				// Customize controller instance
-				SignupController signupController =  new SignupController(stage, model);
-
+				SignupController signupController = new SignupController(stage, model);
 				loader.setController(signupController);
 				VBox root = loader.load();
-				
 				signupController.showStage(root);
-				
 				message.setText("");
 				name.clear();
 				password.clear();
-				
 				stage.close();
 			} catch (IOException e) {
-				message.setText(e.getMessage());
-			}});
+				message.setText("Error loading signup view: " + e.getMessage());
+				message.setTextFill(Color.RED);
+			}
+		});
 	}
-	
+
 	public void showStage(Pane root) {
 		Scene scene = new Scene(root, 500, 300);
 		stage.setScene(scene);
