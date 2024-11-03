@@ -100,7 +100,7 @@ public class AdminController {
 
     private void loadBooksData() {
         try {
-            booksData = FXCollections.observableArrayList(model.books());
+            booksData = FXCollections.observableArrayList(model.adminBooks());
             bookTable.setItems(booksData);
         } catch (SQLException e) {
             showAlert("Error", "Failed to load books data.");

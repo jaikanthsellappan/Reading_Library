@@ -40,6 +40,10 @@ public class Model {
         return books.subList(0, Math.min(5, books.size())); // Return top 5 or fewer if not enough
     }
     
+    public List<Book> adminBooks() throws SQLException {
+        return bookdao.getAllBooks();
+    }
+    
     public String addBookToCart(Book book, int quantity, User user) {
         int availableStock = bookdao.getBookStock(book);
         int currentCartQuantity = bookdao.getCartQuantity(user, book);
